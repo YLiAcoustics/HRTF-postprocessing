@@ -379,7 +379,7 @@ i
        
        for i=1:361
            for j=9:159   %80  ->   -70  
-                dlmwrite('3dmatrix_THKOELN_1_degree_L.txt',squeeze(matrixL(362-i,j,:))','-append');
+                dlmwrite('3dmatrix_THKOELN_1_degree_L.txt',squeeze(matrixL(362-i,j,:))','-append');   % Write matrix to ASCII-delimited file (not recommended by matlab)
                 dlmwrite('3dmatrix_THKOELN_1_degree_R.txt',squeeze(matrixR(362-i,j,:))','-append');
            end 
            i
