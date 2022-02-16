@@ -1,4 +1,4 @@
-
+% https://ch.mathworks.com/matlabcentral/fileexchange/44248-minimum-phase-filter
 
 
 %% min_phase_filter computes the minimum phase counterpart of given filter.
