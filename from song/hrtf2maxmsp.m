@@ -273,7 +273,8 @@ end
        for i=1:181
            for j=1:89
                % smooth the HRTF with simple auditory filter to overcome the clicks caused by switch HRTFs in bianural rendering
-               % this function "hsmooth" is provided by CIPIC 
+               % this function "hsmooth" is provided by CIPIC
+               % (C:\Users\root\Documents\00phd\Database\CIPIC_hrtf_database\standard_hrir_database\show_data)
                % avoid peaks in interpolation
                 dB_L = hsmooth(squeeze(Magnitude_L(i,j,:)),30);               % hsmooth results in dB
                 dB_R = hsmooth(squeeze(Magnitude_R(i,j,:)),30);
@@ -286,7 +287,7 @@ end
                 H_L=10.^(H_L./20);
                 H_R=10.^(H_R./20);
             
-                % unwrap the phase      % linear phase?
+                % unwrap the phase    
                 Phase_L_unwrap = unwrap(squeeze(Phase_L(i,j,:)));
                 Phase_R_unwrap = unwrap(squeeze(Phase_R(i,j,:)));
 
