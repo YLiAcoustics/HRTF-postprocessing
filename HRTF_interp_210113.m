@@ -182,23 +182,23 @@ for i = 1:101
         minRNew(:,i,k+1)=spline(azimuth,minRMatrix,k); 
         tauLNew(i,k+1)= spline(azimuth,squeeze(tauL(i,:)),k);           % interpolate the onset delay
         tauRNew(i,k+1)= spline(azimuth,squeeze(tauR(i,:)),k); 
-        % store in interpolated HRIR matrix
-        HRIR_L_interp(tauLNew(i,k+1)+1:N,i,k+1) = minLNew(1:N-tauLNew(i,k+1),i,k+1);  
-        HRIR_R_interp(tauRNew(i,k+1)+1:N,i,k+1) = minRNew(1:N-tauRNew(i,k+1),i,k+1); 
-        HRIR_L_interp(1:tauLNew(i,k+1),i,k+1) = 0;
-        HRIR_R_interp(1:tauRNew(i,k+1),i,k+1) = 0;
+%         % store in interpolated HRIR matrix
+%         HRIR_L_interp(tauLNew(i,k+1)+1:N,i,k+1) = minLNew(1:N-tauLNew(i,k+1),i,k+1);  
+%         HRIR_R_interp(tauRNew(i,k+1)+1:N,i,k+1) = minRNew(1:N-tauRNew(i,k+1),i,k+1); 
+%         HRIR_L_interp(1:tauLNew(i,k+1),i,k+1) = 0;
+%         HRIR_R_interp(1:tauRNew(i,k+1),i,k+1) = 0;
 %      HRTF_interp(k+1,1,:) = fft(HRIR_interp(k+1,1,:));
 %      HRTF_interp(k+1,2,:) = fft(HRIR_interp(k+1,2,:));
-
-        % concatenate HRIRs at different distances and diretions 
-        HRIR_full_vec(512*(361*(i-1)+k)+1:512*(361*(i-1)+k)+512,1) = HRIR_L_interp(:,i,k+1);
-        HRIR_full_vec(512*(361*(i-1)+k)+1:512*(361*(i-1)+k)+512,2) = HRIR_R_interp(:,i,k+1);
+% 
+%         % concatenate HRIRs at different distances and diretions 
+%         HRIR_full_vec(512*(361*(i-1)+k)+1:512*(361*(i-1)+k)+512,1) = HRIR_L_interp(:,i,k+1);
+%         HRIR_full_vec(512*(361*(i-1)+k)+1:512*(361*(i-1)+k)+512,2) = HRIR_R_interp(:,i,k+1);
     end
     i
 end
 
 % normalize
-HRIR_full_vec = HRIR_full_vec/max(max(abs(HRIR_full_vec)));
+% HRIR_full_vec = HRIR_full_vec/max(max(abs(HRIR_full_vec)));
 % audiowrite('PKUIOA_hrirformax_0404_left.wav',HRIR_full_vec(:,1),fs);
 % audiowrite('PKUIOA_hrirformax_0404_right.wav',HRIR_full_vec(:,2),fs);
 
