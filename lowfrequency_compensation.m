@@ -76,8 +76,8 @@ for n = 1:original.API.M %all azimuths and distances
 %         win = win(1:Nwin/2); %use only first half
 %         ir_corrected_trunc(1:Nwin/2) = ir_corrected_trunc(1:Nwin/2).*win;
 % 
-%         %save new impulse response for SOFA data array
-%         new_irs(n,nn,:) = ir_corrected_trunc;
+        %save new impulse response for SOFA data array
+        new_irs(n,nn,:) = ir_corrected_trunc;
         
         %plot HRTFs only for one example azimuth
         azimuth_example = 90; %in degree
