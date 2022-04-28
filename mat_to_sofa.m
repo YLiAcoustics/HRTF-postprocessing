@@ -28,8 +28,8 @@ sofa_ir = zeros(M*L,2,N); % data.IR must be [M R N]
 % Fill data with data
 for ll = 1:L % distance
     for aa=2:length(lat1)  % azimuth
-		Obj.Data.IR(M*(ll-1)+aa,1,:) = squeeze(HRIR_mat(:,1,ll,length(lat1)+1-aa)); % in the sofa convention, 90 degrees = left = channel 1
-		Obj.Data.IR(M*(ll-1)+aa,2,:) = squeeze(HRIR_mat(:,2,ll,length(lat1)+1-aa));
+		Obj.Data.IR(M*(ll-1)+aa,1,:) = squeeze(HRIR_mat(:,1,ll,74-aa)); % in the sofa convention, 90 degrees = left = channel 1
+		Obj.Data.IR(M*(ll-1)+aa,2,:) = squeeze(HRIR_mat(:,2,ll,74-aa));
 		[azi,ele]=hor2sph(lat(aa),pol(aa));
         Obj.SourcePosition((ll-1)*M+aa,:)=[azi ele (ll-1)/100+0.2];
     end
