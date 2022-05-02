@@ -7,45 +7,23 @@ clear
 close all
 
 %% import data (original HRIRs) for interpolation
-% dis = 20;                           % source distance (cm)
 fs = 48000;                         % sampling rate (Hz)
 
-cd 'C:\Users\root\Documents\00 phd\measurement\Continuous-distance-NF-HRTF\220111ContinuousDistanceHRTF\0121\results'
-HRIR_mat = importdata('HRIR_512_101_73_normalized_0311.mat');
-lp_HRIR_mat = importdata('Lowpass_HRIR_3000.mat');
+cd 'C:\Users\root\Documents\00 phd\measurement\Continuous-distance-NF-HRTF\220111ContinuousDistanceHRTF\database'
+Obj = SOFAload('continuous_HRIR_normalized_lfcorr.sofa');
+for i = 1:101
+    HRIR_mat(:,1,i,1) = Obj.Data.IR(72*(i-1)+1,1,:);   % left
+    HRIR_mat(:,2,i,1) = Obj.Data.IR(72*(i-1)+1,2,:);   % right
+    for j = 2:72
+        HRIR_mat(:,1,i,74-j) = Obj.Data.IR(72*(i-1)+j,1,:);  % note that the coordinate in SOFA convention is opposite that of the original data, therefore azimuth
+                                                             % of the SOFA HRIRs must be reversed.
+                                                             % e.g. the 2nd HRIR (5 degree) is interchanged with the 72nd HRIR (355 degree).                                                 
+        HRIR_mat(:,2,i,74-j) = Obj.Data.IR(72*(i-1)+j,2,:);
+    end
+end
 N = 512;
-azimuth = [0:5:360]';                % original data
-% data01 = importdata('dist_0.2m.mat');
-% data02 = importdata('dist_0.3m.mat');
-% data03 = importdata('dist_0.5m.mat');
-% data04 = importdata('dist_0.75m.mat');
-% data05 = importdata('dist_1.0m.mat');
-% 
-% HRIR_mat(:,:,1,:) = data01(:,:,1:512)*0.2;
-% HRIR_mat(:,:,2,:) = data02(:,:,1:512)*0.3;
-% HRIR_mat(:,:,3,:) = data03(:,:,1:512)*0.5;
-% HRIR_mat(:,:,4,:) = data04(:,:,1:512)*0.75;
-% HRIR_mat(:,:,5,:) = data05(:,:,1:512);
+azimuth = [0:5:360]';                % original grid
 
-% normalize
-% HRIR_mat = HRIR_mat/max(max(max(max(abs(HRIR_mat)))));
-% HRIR_mat = permute(HRIR_mat,[4 2 3 1]);
-
-% data_name = strcat('SCUT_KEMAR_radius_',num2str(dis/100),'.sofa');
-% data_sofa = SOFAload(data_name);
-% HRIR_sofa = data_sofa.Data.IR;
-% 
-% fs_sofa = data_sofa.Data.SamplingRate;
-% 
-% % extract HRIR data on the horizontal plane
-% HRIR_ori = HRIR_sofa(145:216,:,:);
-% % correct azimuth sequence
-% for k = 2:37
-%     temp = HRIR_ori(k,:,:);
-%     HRIR_ori(k,:,:) = HRIR_ori(74-k,:,:);
-%     HRIR_ori(74-k,:,:) = temp;
-% end
-% 
 % % resample if necessary
 % if fs ~= fs_sofa
 %     for i = 1:72
@@ -55,20 +33,6 @@ azimuth = [0:5:360]';                % original data
 % else
 %     HRIR = HRIR_ori;
 % end
-% 
-% HRIR = permute(HRIR,[3 2 1]);
-% HRIR = HRIR(1:512,:,:);
-% 
-% % concatenate HRIRs at different diretions for inspecting magnitude
-% HRIR_full_vec = zeros(512*72,2);
-% for j = 1:72
-%         HRIR_full_vec(512*(j-1)+1:512*j,1) = HRIR(:,1,j);
-%         HRIR_full_vec(512*(j-1)+1:512*j,2) = HRIR(:,2,j);
-% end
-% 
-% %% save data 
-% % audiowrite(['hrir_vec_' num2str(dis/100) '.wav'],HRIR_full_vec,fs);
-% save(['hrir_vec_' num2str(dis/100) '.mat'],'HRIR_full_vec');
 
 tic
 %%%% BEGIN from Song hrtf2msp
@@ -94,16 +58,10 @@ for i = 1:101
         Phase_R(:,i,j)=angle(fft(HRIR_R(:,i,j),512));
     end
 end
-% magnitude and phase for 360° is equal to 0°
-Magnitude_L(:,:,73) = Magnitude_L(:,:,1);
-Magnitude_R(:,:,73) = Magnitude_R(:,:,1);
-
-Phase_L(:,:,73) = Phase_L(:,:,1);
-Phase_R(:,:,73) = Phase_R(:,:,1);
 
 %% get the onset delay (in samples)
 % %% low-pass filtering
-% for i = 1:5
+% for i = 1:101
 %     for j = 1:72
 %         lp_HRIR_mat(:,1,i,j) = lowpass(HRIR_mat(:,1,i,j),3000,48000);
 %         lp_HRIR_mat(:,2,i,j) = lowpass(HRIR_mat(:,2,i,j),3000,48000);
@@ -111,11 +69,14 @@ Phase_R(:,:,73) = Phase_R(:,:,1);
 %     i
 % end
 
-for k = 1:101
-    for i = 1:72    
+lp_HRIR_mat_L = importdata('lp_normalized_lfcorrected_3000_L.mat');
+lp_HRIR_mat_R = importdata('lp_normalized_lfcorrected_3000_R.mat');
+
+for i = 1:101
+    for j = 1:72    
         % 10 times upsampling
-        H_Matrix_L_Up=resample(squeeze(lp_HRIR_mat(:,1,k,i)),fs*10,fs);
-        H_Matrix_R_Up=resample(squeeze(lp_HRIR_mat(:,2,k,i)),fs*10,fs);
+        H_Matrix_L_Up=resample(squeeze(lp_HRIR_mat_L(:,i,j)),fs*10,fs);
+        H_Matrix_R_Up=resample(squeeze(lp_HRIR_mat_R(:,i,j)),fs*10,fs);
     
         % find the maximal value
         H_Matrix_L_Up_Max= find(abs(H_Matrix_L_Up)==max(abs(H_Matrix_L_Up)));
@@ -128,8 +89,8 @@ for k = 1:101
                 break;
             end
         end
-%         tau(i,1)=Tau/10/fs;    % downsampling
-        tauL(k,i)=Tau/10;         % store onset delay in number of samples
+%         tau(i,1)=Tau/10/fs;   
+        tauL(i,j)=Tau/10;         % store onset delay in number of samples
         
      % right ear
         for q=1:H_Matrix_R_Up_Max
@@ -139,29 +100,47 @@ for k = 1:101
             end
         end
 %        tau(i,2)=Tau/10/fs; 
-       tauR(k,i)= Tau/10;    
+       tauR(i,j)= Tau/10;    
     end
 end
-
-% % correct irregular values (caused by some DC offset at the contralateral ear)
-% for k = 1:101
-%     for i = 1:73   
-%         % because ITD varies very little with distance (no more than one
-%         % sample for adjacent distances), find those that have differences
-%         % with the prvious one larger than 2 samples
-%         if abs(tauL(k,i)-tauL(k-1,i))>2
 
 %% 2. Minimum phase reconstruction of original HRIRs
-min_HRIR = zeros(N,2,5,72); % Minimal phase system  
+min_HRIR = zeros(N,2,101,73); % Minimum-phase system  
 
-for k = 1:101
+for i = 1:101
     for j = 1:72
-        [yL,yLm]= rceps(squeeze(HRIR_mat(:,1,k,j)));       % H_L is the magnitude
-        [yR,yRm]= rceps(squeeze(HRIR_mat(:,2,k,j)));
-        min_HRIR(:,1,k,j)=yLm;        % store the minimum phase HRIRs (time domain)
-        min_HRIR(:,2,k,j)=yRm;
+        % smooth the HRTF with simple auditory filter ot overcome the clicks caused by switch HRTFs in bianural rendering
+        % this function "hsmooth" is provided by CIPIC 
+        dB_L = hsmooth(squeeze(Magnitude_L(:,i,j)),30); 
+        dB_R = hsmooth(squeeze(Magnitude_R(:,i,j)),30);
+                
+        % mirror the half spectrum
+        H_L=[dB_L;flip(dB_L(2:end-1))]; 
+        H_R=[dB_R;flip(dB_R(2:end-1))]; 
+
+        % convert db to amplitude
+        H_L=10.^(H_L./20);
+        H_R=10.^(H_R./20);
+            
+        % unwrap the phase
+        Phase_L_unwrap = unwrap(squeeze(Phase_L(:,i,j)));
+        Phase_R_unwrap = unwrap(squeeze(Phase_R(:,i,j)));
+
+        % minimumphase system 
+        [yL,yLm]= rceps(ifft(H_L.*exp(1j*Phase_L_unwrap),'symmetric'));       % H_L is the magnitude
+        [yR,yRm]= rceps(ifft(H_R.*exp(1j*Phase_R_unwrap),'symmetric'));
+        min_HRIR(:,1,i,j)=yLm;        % store the minimum phase HRIRs (time domain)
+        min_HRIR(:,2,i,j)=yRm;
     end
+    i
 end
+
+% magnitude and phase for 360° is equal to 0°
+Magnitude_L(:,:,73) = Magnitude_L(:,:,1);
+Magnitude_R(:,:,73) = Magnitude_R(:,:,1);
+
+Phase_L(:,:,73) = Phase_L(:,:,1);
+Phase_R(:,:,73) = Phase_R(:,:,1);
 
 tauL(:,73) = tauL(:,1);
 tauR(:,73) = tauR(:,1);
@@ -172,12 +151,12 @@ minLNew = zeros(512,101,361);     % matrix to store intepolated minimum-phase HR
 minRNew = zeros(512,101,361);
 tauLNew = zeros(101,361);     % matrix to store interpolated time delay
 tauRNew = zeros(101,361);
-HRIR_full_vec = zeros(512*101*361,2);
+% HRIR_full_vec = zeros(512*101*361,2);
 
 for i = 1:101
     minLMatrix=squeeze(min_HRIR(:,1,i,:));
     minRMatrix=squeeze(min_HRIR(:,2,i,:));
-    for k = 0:360        % directions to be interpolated: 0-359 deg
+    for k = 0:360        % directions to be interpolated: 1:359
         minLNew(:,i,k+1)=spline(azimuth,minLMatrix,k);  % interpolate the HRIRs (sample-wise)
         minRNew(:,i,k+1)=spline(azimuth,minRMatrix,k); 
         tauLNew(i,k+1)= spline(azimuth,squeeze(tauL(i,:)),k);           % interpolate the onset delay
@@ -197,7 +176,14 @@ for i = 1:101
     i
 end
 
+% check if the 361th IR equals the 1st IR
+
 % normalize
+MaxL = max(max(max(abs(minLNew))));
+MaxR = max(max(max(abs(minRNew))));
+Max = max(MaxL,MaxR);
+minLNew = minLNew/Max;
+minRNew = minRNew/Max;
 % HRIR_full_vec = HRIR_full_vec/max(max(abs(HRIR_full_vec)));
 % audiowrite('PKUIOA_hrirformax_0404_left.wav',HRIR_full_vec(:,1),fs);
 % audiowrite('PKUIOA_hrirformax_0404_right.wav',HRIR_full_vec(:,2),fs);
@@ -209,9 +195,9 @@ ITD_interpolated = squeeze((tauLNew-tauRNew)/fs*10^6);
 % r_tauLNew = round(tauLNew);
 % r_tauRNew = round(tauRNew);
 
-% cd 'C:\Users\root\Documents\00 phd\measurement\201020 KEMAR HRTF AP\saved data\0111\ITD'
-% save(strcat('ITD_',num2str(dis),'cm.mat'),'ITD');
-% save(strcat('ITD_original_',num2str(dis),'cm.mat'),'ITD_original');
+cd 'C:\Users\root\Documents\00 phd\measurement\Continuous-distance-NF-HRTF\220111ContinuousDistanceHRTF\database'
+save('data_continuous_HRIR_interpolated_normalized_lpcorrected_smoothed.mat','minLNew','minRNew','tauLNew','tauRNew','ITD','ITD_interpolated');
+
 
 % save(strcat('HRIR_interp_',num2str(dis),'cm.mat'),'HRIR_interp');
 %  save(strcat('HRTF_interp_',num2str(dis),'cm.mat'),'HRTF_interp');
@@ -262,39 +248,40 @@ ITD_interpolated = squeeze((tauLNew-tauRNew)/fs*10^6);
 % disp(['Saving:  ' SOFAfn]);
 % Obj=SOFAsave(SOFAfn, Obj);
 % 
-% %% 4. store as .txt 
-% Re_minL=zeros(512,6,360); Re_minR=zeros(512,6,360);
-% Im_minL=zeros(512,6,360); Im_minR=zeros(512,6,360);
-% matrixL=zeros(513,6,360);
-% matrixR=zeros(513,6,360);           % the first element stores tau
-% 
-% for k = 1:6
-%     for i=1:360
-%         ReL=real(fft(squeeze(minLNew(:,k,i))));       % left ear HRTF real part
-%         ReR=real(fft(squeeze(minRNew(:,k,i))));       % right ear HRTF real part
-%         ImL=imag(fft(squeeze(minLNew(:,k,i))));       % left ear HRTF imaginary part
-%         ImR=imag(fft(squeeze(minRNew(:,k,i))));       % right ear HRTF imaginary part
-% 
-%          % store one sided HRTF
-%          % especially for max/msp object "pfft~"
-%          rowL=[tauLNew(k,i),ReL(1:N/2)',ImL(1:N/2)'];     % row vector (N+1)x1 = tau - N/2 real - N/2 imag
-%          rowR=[tauRNew(k,i),ReR(1:N/2)',ImR(1:N/2)'];
-% 
-%          matrixL(:,k,i)=rowL;
-%          matrixR(:,k,i)=rowR;
-%     end
-% end
-% 
-% % cd 'C:\Users\root\Documents\00 phd\Database\SCUT HRTF (near-field)\HRIR data'
+%% 4. store as .txt 
+Re_minL=zeros(512,101,361); Re_minR=zeros(512,101,361);
+Im_minL=zeros(512,101,361); Im_minR=zeros(512,101,361);
+matrixL=zeros(513,101,361);
+matrixR=zeros(513,101,361);           % the first element stores tau
+
+for i = 1:101
+    for j=1:361
+        ReL=real(fft(squeeze(minLNew(:,i,j))));       % left ear HRTF real part
+        ReR=real(fft(squeeze(minRNew(:,i,j))));       % right ear HRTF real part
+        ImL=imag(fft(squeeze(minLNew(:,i,j))));       % left ear HRTF imaginary part
+        ImR=imag(fft(squeeze(minRNew(:,i,j))));       % right ear HRTF imaginary part
+
+         % store one sided HRTF
+         % especially for max/msp object "pfft~"
+         rowL=[tauLNew(i,j),ReL(1:N/2)',ImL(1:N/2)'];     % row vector (N+1)x1 = tau - N/2 real - N/2 imag
+         rowR=[tauRNew(i,j),ReR(1:N/2)',ImR(1:N/2)'];
+
+         matrixL(:,i,j)=rowL;
+         matrixR(:,i,j)=rowR;
+    end
+end
+
+% % cd 'C:\Users\root\Documents\00 phd\Database\SCUT HRTF (near-field)\HRIR
+% data'g
 % % save(strcat('matrix_interp_L_',num2str(dis),'cm.mat'),'matrix(:,1,:)');
 % % save(strcat('matrix_interp_R_',num2str(dis),'cm.mat'),'matrix(:,2,:)');
-% 
-% for k = 1:6
-%     for i=1:360
-%         dlmwrite(['matrix_SCUT_L.txt'],squeeze(matrixL(:,k,i))','-append'); % Write matrix to ASCII-delimited file (not recommended by matlab)
-%         dlmwrite(['matrix_SCUT_R.txt'],squeeze(matrixR(:,k,i))','-append');
-%     end 
-%     k
-% end
+
+for i = 1:101
+    for j=1:361
+        dlmwrite(['matrix_continuous_L_0502(smoothed).txt'],squeeze(matrixL(:,i,j))','-append'); % Write matrix to ASCII-delimited file (not recommended by matlab)
+        dlmwrite(['matrix_continuous_R_0502(smoothed).txt'],squeeze(matrixR(:,i,j))','-append');
+    end 
+    i
+end
 % %%% END from Song hrtf2msp
 % toc
