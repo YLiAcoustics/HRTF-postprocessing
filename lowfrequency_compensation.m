@@ -37,7 +37,8 @@ new_length = 512; %new length of HRTFs
 %% Correct and truncate impulse responses
 new_irs = zeros(original.API.M,original.API.R,new_length); %preallocation
 for n = 1:original.API.M %all azimuths and distances
-    for nn = 1:original.API.R %left and right channel
+%     for nn = 1:original.API.R %left and right channel
+nn = 1;
         ir = squeeze(original.Data.IR(n,nn,:));
         HRTF = fft(ir);
         
@@ -55,7 +56,7 @@ for n = 1:original.API.M %all azimuths and distances
         %extrapolate phase from data between lower frequency bound and
         %higher frequency bound
         HRTF_phase_corrected(1:indl-1) = interp1(f(indl:indh),...
-            HRTF_phase(indl:indh),f(1:indl-1),'linear','extrap');
+        HRTF_phase(indl:indh),f(1:indl-1),'linear','extrap');
         
         %compose complex spectrum
         HRTF_corrected = HRTF_mag_corrected.*exp(1i*HRTF_phase_corrected);
@@ -81,7 +82,7 @@ for n = 1:original.API.M %all azimuths and distances
         
         %plot HRTFs only for one example azimuth
         azimuth_example = 90; %in degree
-        distance_example = 1;
+        distance_example = 0.2;
         if (original.SourcePosition(n,1) == azimuth_example) && (original.SourcePosition(n,3) == distance_example)
             HRTF_corrected_trunc = fft(ir_corrected_trunc,N);
             gd = grpdelay(ir,1,N,'whole',fs);
@@ -91,28 +92,40 @@ for n = 1:original.API.M %all azimuths and distances
             elseif nn == 2
                 side = 'right';
             end
-            figure('name',[num2str(original.SourcePosition(n,1)) '° azimuth, '...
-                side])
-            subplot(2,2,1)
-                plot(db(abs(ir)),'LineWidth',0.8,'Color','#B22222'), hold on
-                plot(db(abs(ir_corrected_trunc)),'LineWidth',0.8,'Color','#008000')
+%             figure('name',[num2str(original.SourcePosition(n,1)) '° azimuth, '...
+%                 side])
+%             set(gcf,'Units','Normalized');
+%             set(gcf,'Position',[0.1 0.1 0.5 0.5]);
+            figure(1)
+            set(gcf,'Units','Normalized');
+            set(gcf,'Position',[0.1 0.1 0.25 0.3]);
+%             subplot(2,2,1)
+%                 plot(db(abs(ir)),'LineWidth',0.8,'Color','#B22222'), hold on
+%                 plot(db(abs(ir_corrected_trunc)),'LineWidth',0.8,'Color','#008000')
+%                 grid
+%                 axis([0 N -140 0])
+%                 xlabel('time (samples)'),
+%                 ylabel('impulse response magnitude (dB)')
+% %                 legend('original','corr. + trunc.')
+%                 legend('original','corrected')
+%                 ax = gca;
+%                 ax.LineWidth = 0.8;
+%             subplot(2,2,3)
+                plot_HRTF = 2*abs(HRTF);
+                plot_HRTF(1) = plot_HRTF(1)/2;
+                plot_HRTF_corrected_trunc = 2*abs(HRTF_corrected_trunc);
+                plot_HRTF_corrected_trunc(1) = plot_HRTF_corrected_trunc(1)/2;
+                semilogx(f,db(plot_HRTF),'LineWidth',0.8,'Color','#B22222'), hold on
+                semilogx(f,db(plot_HRTF_corrected_trunc),'LineWidth',0.8,'Color','#008000')
                 grid
-                axis([0 N -140 0])
-                xlabel('time (samples)'),
-                ylabel('impulse response magnitude (dB)')
-%                 legend('original','corr. + trunc.')
-                legend('original','corrected')
-                ax = gca;
-                ax.LineWidth = 0.8;
-            subplot(2,2,3)
-                semilogx(f,db(abs(HRTF)),'LineWidth',0.8,'Color','#B22222'), hold on
-                semilogx(f,db(abs(HRTF_corrected_trunc)),'LineWidth',0.8,'Color','#008000')
-                grid
-                axis([80 fs/2 -60 10])
+                axis([100 fs/2 -20 20])
                 xlabel('frequency (Hz)'), ylabel('magnitude response (dB)')
                 ax = gca;
                 ax.LineWidth = 0.8;
-            subplot(2,2,2)
+%             subplot(2,2,2)
+                figure(2)
+                set(gcf,'Units','Normalized');
+                set(gcf,'Position',[0.1 0.1 0.25 0.3]);
                 semilogx(f,angle(HRTF),'LineWidth',0.8,'Color','#B22222'), hold on
                 semilogx(f,angle(HRTF_corrected_trunc),'LineWidth',0.8,'Color','#008000')
                 grid
@@ -120,20 +133,19 @@ for n = 1:original.API.M %all azimuths and distances
                 xlabel('frequency (Hz)'), ylabel('phase (rad)')
                 ax = gca;
                 ax.LineWidth = 0.8;
-            subplot(2,2,4)
-                semilogx(f,gd,'LineWidth',0.8,'Color','#B22222'), hold on
-                semilogx(f,gd_corrected_trunc,'LineWidth',0.8,'Color','#008000')
-                grid
-                axis([80 fs/2 -500 3500])
-                xlabel('frequency (Hz)'), ylabel('group delay (samples)')
-                ax = gca;
-                ax.LineWidth = 0.8;
-        end
+%             subplot(2,2,4)
+%                 semilogx(f,gd,'LineWidth',0.8,'Color','#B22222'), hold on
+%                 semilogx(f,gd_corrected_trunc,'LineWidth',0.8,'Color','#008000')
+%                 grid
+%                 axis([80 fs/2 -500 3500])
+%                 xlabel('frequency (Hz)'), ylabel('group delay (samples)')
+%                 ax = gca;
+%                 ax.LineWidth = 0.8;
+%         end
     end
 end
 
-%% Update SOFA fields
-new = original; %copy SOFA struct
+%% Update SOFA fields2new = original; %copy SOFA struct
 
 %replace data array
 new.Data.IR = new_irs;
