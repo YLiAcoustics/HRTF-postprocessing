@@ -9,25 +9,24 @@ close all
 Obj = SOFAgetConventions('SimpleFreeFieldHRIR');  % sampling rate: 48000Hz
 
 %% Define positions -  we use the standard CIPIC positions here
-lat1= 5*(0:71);    % lateral angles (azimuth)
+lat1= 10*(0:36);    % lateral angles (azimuth)
 pol1= 0;                % polar angles (elevation)
 pol=repmat(pol1',length(lat1),1);
 lat=lat1(round(0.5:1/length(pol1):length(lat1)+0.5-1/length(pol1)));
 
 %% Create the HRIR matrix
 M = length(lat1)*length(pol1);
-N = 960;
+N = 512;
 Obj.Data.IR = NaN(M,2,N); % data.IR must be [M R N]
 
-%% Fill data with data
-cd 'C:\Users\root\Documents\00 phd\measurement\201020 KEMAR HRTF AP\HRIRs\1203\25cm'
+%% Fill Obj with IR data
+cd 'C:\Users\root\Documents\00 phd\measurement\Continuous-distance-NF-HRTF\220619ContinuousDistanceHRTFKU100\data\0620'
+hrir = importdata('hrir_lowpass_16k_new.mat');
 ii=1;       % IR number (including elevation and azimuth)
 for aa=1:length(lat1)
 	for ee=1:length(pol1)
-        HRIR_name_l = strcat(['HRIR_25_' num2str(5*(ee-1)) '_l.wav']);
-        HRIR_name_r = strcat(['HRIR_25_' num2str(5*(ee-1)) '_r.wav']);
-		Obj.Data.IR(ii,1,:) = audioread(HRIR_name_l);
-		Obj.Data.IR(ii,2,:) = audioread(HRIR_name_r);
+		Obj.Data.IR(ii,1,:) = hrir(aa,1,:,ee);
+		Obj.Data.IR(ii,2,:) = hrir(aa,2,:,ee);
 		[azi,ele]=hor2sph(lat(ii),pol(ii));
         Obj.SourcePosition(ii,:)=[azi ele 1];
 		Obj.SourcePosition(ii,:)=[azi ele 1];
@@ -41,7 +40,7 @@ Obj=SOFAupdateDimensions(Obj);
 %% Fill with attributes
 Obj.GLOBAL_ListenerShortName = 'KEMAR';
 Obj.GLOBAL_History = 'created with a script';
-Obj.GLOBAL_DatabaseName = 'near-field';
+Obj.GLOBAL_DatabaseName = 'near-field continuous HRIR of KU100 dummy head';
 % Obj.GLOBAL_ApplicationName = 'Demo of the SOFA API';
 Obj.GLOBAL_ApplicationVersion = SOFAgetVersion('API');
 Obj.GLOBAL_Organization = 'Institut für Kommunikationstechnik';
@@ -49,6 +48,6 @@ Obj.GLOBAL_AuthorContact = 'yuqing.li@ikt.uni-hannover.com';
 Obj.GLOBAL_Comment = 'Contains simple pulses for all directions';
 
 %% save the SOFA file
-SOFAfn=fullfile('C:\Users\root\Documents\00 phd\measurement\201020 KEMAR HRTF AP\SOFA','HRIR25cm.sofa');
+SOFAfn=fullfile('C:\Users\root\Documents\00 phd\measurement\Continuous-distance-NF-HRTF\220619ContinuousDistanceHRTFKU100\data\0620','hrir_lowpass_16k_new.sofa');
 disp(['Saving:  ' SOFAfn]);
 Obj=SOFAsave(SOFAfn, Obj);

@@ -15,8 +15,8 @@ cd 'C:\Users\root\Documents\00 phd\measurement\ListeningExperiments\TestFolder\P
 %     ori = 5*(n-1);
 
 % cd('C:\Users\root\Documents\00 phd\Database');
-sig_l = audioread('conti_HRTF_01_left.wav');
-sig_r = audioread('conti_HRTF_01_right.wav');
+sig_l = audioread('conti_HRTF_02_left.wav');
+sig_r = audioread('conti_HRTF_02_right.wav');
 
 % 0
 filter_l_0 = sig_l([1:512]);

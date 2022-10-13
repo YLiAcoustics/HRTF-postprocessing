@@ -1,0 +1,24 @@
+%%% This script generates an audio file of sampling rate 192000Hz.
+clear
+close all
+
+fs = 48000;
+t1 = 3;
+
+% generate noise
+noise = randn(fs*t1,1);
+% generate ramp
+ramp_l = 0.03;           % ramp length in seconds
+ramp = [0:round(ramp_l*fs)]'/round(ramp_l*fs);
+
+% onset
+noise(1:length(ramp)) = noise(1:length(ramp)).*ramp;
+% offset
+noise((length(noise)-length(ramp)+1):end) = noise((length(noise)-length(ramp)+1):end).*flip(ramp);
+
+% pause = zeros(fs*t2,1);
+% output = [noise;pause;noise;pause;noise];
+noise = noise/max(abs(noise));
+cd 'C:\Users\root\Documents\00 phd\Database\dry audio\audio files'
+audiowrite('white_Gaussian_noise_3s.wav',noise,fs,'Comment','This is a 3s-long white Gaussian noise, with 30 ms onset and offset line');
+

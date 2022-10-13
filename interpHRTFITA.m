@@ -1,7 +1,6 @@
 %%%%%% This MATLAB script interpolates and extrapolates HRTFs using the ITA
 %%%%%% toolbox. theta = elevation, phi = azimuth
-clear all
-close all
+clear;close all
 
 %% Init object
 cd 'C:\Users\root\Documents\00 phd\measurement\201020 KEMAR HRTF AP\SOFA\25cm'
@@ -52,7 +51,6 @@ rI       = ones(numel(PHI_I),1);
 coordI   = itaCoordinates([rI THETA_I(:) PHI_I(:)],'sph'); % itaCoordinates object
 
 HRTF_interp = HRTF_sphere.interp(coordI);
-
 
 %% Write and init
 nameDaff_file = 'HRTF_sphere.daff';

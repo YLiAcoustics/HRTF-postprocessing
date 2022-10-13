@@ -13,22 +13,20 @@ N = 512;
 Ndir = 37;
 Nchn = 2;
 cd 'C:\Users\root\Documents\00 phd\measurement\Continuous-distance-NF-HRTF\220619ContinuousDistanceHRTFKU100\data\HRTFs'
-% filename = 'HRIR_mea';
-% if strcmp(datatype,'wav')
-%     data = audioread(strcat(filename,'.wav'));
-%     HRIR_mat = zeros(N,Nchn,101,Ndir);
-%     for i = 1:101  
-%         for j = 1:Ndir
-%             for k = 1:Nchn
-%                 HRIR_mat(:,k,i,j) = data(N*(Ndir*(i-1)+j)+1:N*(Ndir*(i-1)+j)+N,Nchn,i,j);
-%             end
-%         end
-%     end
-% else
-%     HRIR_mat = importdata(strcat(filename,'.mat'));
-% end
-data = importdata('VSSLMS_HRIRwin.mat');
-HRIR_mat = data;
+filename = 'HRIR_mea';
+if strcmp(datatype,'wav')
+    data = audioread(strcat(filename,'.wav'));
+    HRIR_mat = zeros(N,Nchn,101,Ndir);
+    for i = 1:101  
+        for j = 1:Ndir
+            for k = 1:Nchn
+                HRIR_mat(:,k,i,j) = data(N*(Ndir*(i-1)+j)+1:N*(Ndir*(i-1)+j)+N,Nchn,i,j);
+            end
+        end
+    end
+else
+    HRIR_mat = importdata(strcat(filename,'.mat'));
+end
 
 Obj = SOFAgetConventions('SimpleFreeFieldHRIR');  % sampling rate: 48000Hz
 
@@ -59,7 +57,7 @@ Obj=SOFAupdateDimensions(Obj);
 
 % Fill with attributes
 Obj.GLOBAL_ListenerShortName = 'Neumann KU100';
-Obj.GLOBAL_Comment = 'This is a database of near-field HRIRs measured on the KU100 dummy head using a continuously moving sound source and the VSSLMS method. Distance resolution: 1 cm.';
+Obj.GLOBAL_Comment = 'This is a database of near-field HRIRs measured on the KU100 dummy head using a continuously moving sound source and the NLMS method. Distance resolution: 1 cm. Low-pass filtered (cutoff f: 16 kHz). Low-frequency compensation were applied for frequencies lower than 300 Hz.';
 Obj.GLOBAL_DatabaseName = 'continuous-distance near-field HRIR (KU100)';
 % Obj.GLOBAL_ApplicationName = 'Demo of the SOFA API';
 Obj.GLOBAL_ApplicationVersion = SOFAgetVersion('API');
@@ -67,7 +65,7 @@ Obj.GLOBAL_Organization = 'Institut für Kommunikationstechnik, Leibniz Universi
 Obj.GLOBAL_AuthorContact = 'yuqing.li@ikt.uni-hannover.de';
 
 % save the SOFA file
-SOFAfn=fullfile('C:\Users\root\Documents\00 phd\measurement\Continuous-distance-NF-HRTF\220619ContinuousDistanceHRTFKU100\data\HRTFs','KU100_hrir_measurement_vsslms.sofa');
+SOFAfn=fullfile('C:\Users\root\Documents\00 phd\measurement\Continuous-distance-NF-HRTF\220619ContinuousDistanceHRTFKU100\data\HRTFs','KU100_hrir_measurement.sofa');
 disp(['Saving:  ' SOFAfn]);
 compression=0;
 Obj=SOFAsave(SOFAfn, Obj,compression);
