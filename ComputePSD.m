@@ -8,10 +8,10 @@ clear;close all;
 fs = 48000;
 
 %% 0. Import HRTFs and input sigal
-cd 'C:\Users\root\Documents\00 phd\measurement\Continuous-distance-NF-HRTF\220619ContinuousDistanceHRTFKU100\data\HRTFs'
-hrir1=importdata('VSSLMS_HRIRwin.mat');
-hrir2=importdata('mic_HRIR_simwin_new.mat');
-cd 'C:\Users\root\Documents\00 phd\Database\dry audio\audio files'  
+cd 'C:\Users\root\Documents\00phd\00Measurement\Continuous-distance-NF-HRTF\220619ContinuousDistanceHRTFKU100\data\HRTFs'
+hrir1=importdata('HRIR_mea_128.mat');
+hrir2=importdata('HRIR_sim_128.mat');
+cd 'C:\Users\root\Documents\00phd\00HRTFDatabases\dry audio\audio files'  
 monosig=audioread('Gaussian_white_noise_3s.wav');
 monosig=monosig(1:fs);
 
@@ -39,7 +39,7 @@ for i=1:min(s1(4),s2(4))
         binsig1(:,2) = conv(monosig,HRIR1(:,2));
         binsig2(:,1) = conv(monosig,HRIR2(:,1));
         binsig2(:,2) = conv(monosig,HRIR2(:,2));
-        [~,PSpecDiff]=mckenzie2021(binsig1,binsig,domFlag,f);
+        [~,PSpecDiff]=mckenzie2021(binsig1,binsig2,domFlag,f);
         PavgSpecDiffS = mean(PSpecDiff,2);
         PSD(j,i) = PavgSpecDiffS;
         toc
@@ -67,16 +67,17 @@ yticks(0:30:360);
 ylabel(['azimuth (' char(176) ')']);
 xlabel('distance (cm)');
 
-% plot SD and ISSD
+% plot PSD
 figure
 left_color = [16 87 163]/255;
 right_color = [201 197 52]/255;
 set(gcf,'Units','Normalized');
 set(gcf,'Position',[0.1 0.1 0.6 0.5]);
-plot(19:119,mean(PSD,2),'LineWidth',1.4,'Color',[16 87 163]/255);hold on;
+plot(19:119,mean(PSD,2),'LineWidth',1.4,'Color','k');hold on;
 ylabel('PSD (sones)');
-ylim([0 4]);
+ylim([0 5]);
 xlim([19 119]);
+xticks([19:20:119]);
 xlabel('distance (cm)');
 set(gca,'FontSize',12);
 set(gca,'LineWidth',1);
