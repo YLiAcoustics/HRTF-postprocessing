@@ -32,7 +32,7 @@ if fs1~=fsm
     hrir1=resample(hrir1,fsm,fs1,'Dimension',1);
 end
 if fs2~=fsm
-    hrir2=resample(hrir2,fsm,fs1,'Dimension',1);
+    hrir2=resample(hrir2,fsm,fs2,'Dimension',1);
 end
 
 
