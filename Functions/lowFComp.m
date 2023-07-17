@@ -1,10 +1,26 @@
-function [TF,newir,newTF,gd,newgd] = lowFComp(ir,fs,LowF,HighF)
+function [newir,newTF,gd,newgd] = lowFComp(ir,fs,LowF,HighF,varargin)
 %% Performs low frequency compensation using the method in:
 %% - Xie, B. (2009): On the low frequency characteristics of head-related transfer functions. Chinese J. Acoust. 28(2), pp. 1-13
 %% The magnitude response of the HRTFs has been set to a constant value and the phase has been extrapolated linearly for low frequencies. 
-%% Code is provided by https://github.com/spatialaudio/lf-corrected-kemar-hrtfs/Correct_low_frequencies_of_HRTFs.m
-N = length(ir);          % original length of HRIRs
-f = (0:N-1)/N*fs; % frequency vector
+%% Code is modified based on the original script at https://github.com/spatialaudio/lf-corrected-kemar-hrtfs/Correct_low_frequencies_of_HRTFs.m
+%%%% input parameters:
+%%%%                  ir: original HRIR
+%%%%                  fs: sampling rate
+%%%%                  LowF, HighF: bounds of the frequency range used to correct low frequency data
+%%%% output parameters:
+%%%%                   TF: original HRTF
+%%%%                   newir: compensated HRIR
+%%%%                   newTF: compensated HRTF
+%%%%                   gd: original group delay
+%%%%                   newgd: group delay of compensated HRTF
+
+if nargin<3
+    LowF=300;
+    HighF=600;
+end
+
+N = length(ir);         
+f = (0:N-1)/N*fs;      % frequency vector
 
 %% find indices for frequency range used to correct low frequency data
 indl = find(f>=LowF,1,'first');
