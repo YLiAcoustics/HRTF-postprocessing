@@ -29,7 +29,7 @@ hrtf=permute(hrtf,[3,1,2]); %format time,position,channel
 nfft=2^nextpow2(size(hrtf,1)); %define length fft
 HRTF=fft(hrtf,nfft); %HRTF in freq domain
 f=0:FS/nfft:FS-FS/nfft; %freq axis
-idx=f>=50 & f<=18000; %freq range of interest
+idx=f>=50 & f<=20000; %freq range of interest
 idx(nfft/2+2:end)=fliplr(idx(2:nfft/2)); %mirror idx for negative freuq
 %find log-amp mean across positions, add eps to avoid log of 0
 CTFa=10.^(mean(log10(abs(HRTF)+eps),2)); %find CTFs amplitude
@@ -45,8 +45,8 @@ DTF(idx,:,:)=HRTF(idx,:,:)./CTF(idx,:,:);
 % this ensures real time domain signals
 dtf=ifft(DTF,nfft,'symmetric'); %DTFs in time domain
 ctf=ifft(CTF,nfft,'symmetric'); %CTFs in time domain
-ctf=ctf/10^(20/20); %attenuate to avoid clipping
-dtf=dtf/10^(20/20); %attenuate to avoid clipping
+% ctf=ctf/10^(20/20); %attenuate to avoid clipping
+% dtf=dtf/10^(20/20); %attenuate to avoid clipping
 ctf=permute(ctf,[2,3,1]); %format as input
 dtf=permute(dtf,[2,3,1]); %format as input
 
