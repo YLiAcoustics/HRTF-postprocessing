@@ -1,13 +1,13 @@
 clear
 close all
 
-fname = '/Users/yuqingli/Documents/00phd/00Measurement/room acoustics/msg_birkenweg - Kopie/measuredData/m24-07-16_12-59_test2_HATS_S7_G8030__asdf_.mat';
+fname = 'L:\Cloud\DataBackup\testData\m24-07-16_14-23_test2_HATS_STV_G8030__asdf_.mat';
 data=load(fname);
 audioData=data.mData;
 sweep = data.v_sw;
 loopB=data.loopB;
 
-fname2 = '/Volumes/lize9806/Cloud/Living Room 1.1/21-11_repo-v2/HATS/IR_pos-S7_G8030_R1_HATS_F_O.wav';
+fname2 = 'L:\Cloud\Living Room 1.1\21-11_repo-v2\HATS\IR_pos-STV_G8030_R1_HATS_F_O.wav';
 [audio, Fs]=audioread(fname2);
 IR2=audio(:,1:2);
 IR2=IR2/max(max(abs(IR2)));
