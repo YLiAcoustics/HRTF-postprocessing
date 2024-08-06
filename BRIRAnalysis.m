@@ -2,9 +2,9 @@ clear
 close all
 
 fs=44100;
-c=343
+c=343;
 
-disV=[0.5:0.1:3.5];
+disV=[0:0.1:3.5];
 for i=1:length(disV)
     dis=disV(i);
     fname_S4=['IR' num2str(dis) 'm_S4.mat'];
@@ -16,7 +16,6 @@ for i=1:length(disV)
     IRmat(:,:,i,2)=importdata(fname_S5);
     IRmat(:,:,i,3)=importdata(fname_S7);
     IRmat(:,:,i,4)=importdata(fname_STV);
-
 end
 % IRmat=IRmat(1:2048,:,:,:);
 
