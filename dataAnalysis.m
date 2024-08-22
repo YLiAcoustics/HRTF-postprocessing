@@ -1,8 +1,8 @@
 clear
 close all
 
-fname = '/Volumes/lize9806/Cloud/DataBackup/KEMARtrajectory/m24-07-17_15-49_0.5m_HATS_S4_G8030__asdf_.mat';
-fnameIR = '/Volumes/lize9806/Cloud/DataBackup/KEMARtrajectory/IR0.5m_S4.mat';
+fname = 'L:\Cloud\DataBackup\KEMARtrajectory/m24-07-17_18-02_Kitchen0.4m_HATS_S7_G8030__asdf_.mat';
+fnameIR = 'L:\Cloud\DataBackup\KEMARtrajectory/IR_Kitchen0.4m_S7.mat';
 data=load(fname);
 audioData=data.mData;
 sweep = data.v_sw;
